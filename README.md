@@ -9,6 +9,7 @@ Here’s a quick overview of what I built 👇
 ## 🤖 News Classification:
  Used a multilingual NLP model —
  classla/multilingual-IPTC-news-topic-classifier — via the 🤗 Hugging Face Transformers pipeline for topic classification.
+ lstm for dectecting realnews from fake .
 ## 🤖 Threading 
  used threading to enable scraping and at the same time exectracting insights after scraping 1 website 
 
