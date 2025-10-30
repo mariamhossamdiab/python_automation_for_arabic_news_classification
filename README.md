@@ -7,9 +7,9 @@ Here’s a quick overview of what I built 👇
 🔍 Exploratory Analysis:
  Extracted and visualized the top N-grams (most frequent words and phrases) for each source to uncover key themes.
 ## 🤖 News Classification:
- Used a multilingual NLP model —
+ - Used a multilingual NLP model —
  classla/multilingual-IPTC-news-topic-classifier — via the 🤗 Hugging Face Transformers pipeline for topic classification.
- lstm for dectecting realnews from fake .
+ - lstm  model for dectecting real news from fake ones.
 ## 🤖 Threading 
  used threading to enable scraping and at the same time exectracting insights after scraping 1 website 
 
