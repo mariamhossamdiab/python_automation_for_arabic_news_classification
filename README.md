@@ -11,4 +11,5 @@ Here’s a quick overview of what I built 👇
  classla/multilingual-IPTC-news-topic-classifier — via the 🤗 Hugging Face Transformers pipeline for topic classification.
 ## 🤖 Threading 
  used threading to enable scraping and at the same time exectracting insights after scraping 1 website 
- ![WhatsApp Image 2025-08-10 at 20 14 00_9b3bce27](https://github.com/user-attachments/assets/2845a667-1a2f-44c9-ae0d-6cd820b1aba6)
+
+![WhatsApp Image 2025-10-29 at 14 28 39_607026e6](https://github.com/user-attachments/assets/955ec7b3-236d-455f-bae9-7b24b92af173)
