@@ -10,7 +10,9 @@ Here’s a quick overview of what I built 👇
  - Used a multilingual NLP model —
  classla/multilingual-IPTC-news-topic-classifier — via the 🤗 Hugging Face Transformers pipeline for topic classification.
  - lstm  model for dectecting real news from fake ones.
+ - llm model to classify news category .
 ## 🤖 Threading 
  used threading to enable scraping and at the same time exectracting insights after scraping 1 website 
 
 ![WhatsApp Image 2025-10-29 at 14 28 39_607026e6](https://github.com/user-attachments/assets/955ec7b3-236d-455f-bae9-7b24b92af173)
+![WhatsApp Image 2025-10-31 at 15 15 51_699faf4e](https://github.com/user-attachments/assets/8e6704d4-142b-4bd4-97ef-d6e4f3e1edcd)
