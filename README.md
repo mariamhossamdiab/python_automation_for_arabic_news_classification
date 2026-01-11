@@ -23,9 +23,10 @@ It processes multiple CSV files, appends predictions, and prepares the data for 
 <img width="1003" height="212" alt="image" src="https://github.com/user-attachments/assets/a7acb9d9-d63d-4dc9-ab7b-3282c5850c8b" />
 
 ## Powerbi Dashboard 
-![WhatsApp Image 2025-11-14 at 00 23 50_69bb897b](https://github.com/user-attachments/assets/99a591b8-f133-4454-a487-0e2c0c226c18)
-![WhatsApp Image 2025-11-14 at 00 24 12_3c02dc64](https://github.com/user-attachments/assets/17cdc46e-c666-4e35-9823-ad0e94bbbd66)
 
+
+![WhatsApp Image 2026-01-11 at 12 49 38 AM](https://github.com/user-attachments/assets/a19ee4e8-1142-42ec-b846-d350c060b37e)
+![WhatsApp Image 2026-01-11 at 12 49 01 AM](https://github.com/user-attachments/assets/22ca932d-93bb-44cd-b515-8fb1a383455b)
 
 
 
