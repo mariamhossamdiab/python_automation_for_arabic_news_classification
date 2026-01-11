@@ -13,9 +13,9 @@ Here’s a quick overview of what I built 👇
  - llm model to classify news category .
 ## 🤖 Threading 
  used threading to enable scraping and at the same time exectracting insights after scraping 1 website 
+![WhatsApp Image 2026-01-11 at 12 49 38 AM](https://github.com/user-attachments/assets/7d9dc36c-ea8d-4700-8235-0862f2ab43f7)
+![WhatsApp Image 2026-01-11 at 12 49 01 AM](https://github.com/user-attachments/assets/0056a5e2-8161-423e-ab88-be14f26a6769)
 
-![WhatsApp Image 2025-10-29 at 14 28 39_607026e6](https://github.com/user-attachments/assets/955ec7b3-236d-455f-bae9-7b24b92af173)
-![WhatsApp Image 2025-10-31 at 15 15 51_699faf4e](https://github.com/user-attachments/assets/8e6704d4-142b-4bd4-97ef-d6e4f3e1edcd)
 ## google colab
 - sends each article to the Gemma3 model (via Ollama) to classify its topic and whether it’s Real or Fake, then saves the classified results.
 It processes multiple CSV files, appends predictions, and prepares the data for computing global evaluation metrics.
