@@ -1,4 +1,6 @@
+
 I’ve been working on building a puthon automation for news classification — a project that combines web scraping, text processing, and NLP.
+<img width="1024" height="1024" alt="Gemini_Generated_Image_xplxdxplxdxplxdx" src="https://github.com/user-attachments/assets/ae7c8375-725d-4af2-8990-2d4d9ad386bf" />
 Here’s a quick overview of what I built 👇
 ## 📰 Data Collection:
  Scraped news articles from 5 different news websites using both Selenium and Requests, ensuring a diverse dataset.
