@@ -1,20 +1,19 @@
 
 I’ve been working on building a puthon automation for news classification — a project that combines web scraping, text processing, and NLP.
+
 <img width="1024" height="432" alt="Gemini_Generated_Image" src="https://github.com/user-attachments/assets/a47ae362-454a-43c8-aa4d-96cb9f8fc53f" />
 
 
 Here’s a quick overview of what I built 👇
 ## 📰 Data Collection:
- Scraped news articles from 5 different news websites using both Selenium and Requests, ensuring a diverse dataset.
+ Scraped news articles from  6 different news websites using both Selenium and Requests, ensuring a diverse dataset.
 ## 🧹 Text Cleaning & Preprocessing:
  Cleaned and normalized Arabic text (removing HTML tags, special characters, etc.) to prepare for analysis.
 🔍 Exploratory Analysis:
  Extracted and visualized the top N-grams (most frequent words and phrases) for each source to uncover key themes.
 ## 🤖 News Classification:
- - Used a multilingual NLP model —
- classla/multilingual-IPTC-news-topic-classifier — via the 🤗 Hugging Face Transformers pipeline for topic classification.
- - lstm  model for dectecting real news from fake ones.
- - llm model to classify news category .
+ - Used a Gemma3 from ollama for topic classification and for dectecting real news from fake ones.
+ - used dackdack search go for online search about facts
 ## 🤖 Threading 
  used threading to enable scraping and at the same time exectracting insights after scraping 1 website 
 
@@ -31,6 +30,8 @@ It processes multiple CSV files, appends predictions, and prepares the data for 
 
 
 ## website 
+- frontend using html , css, vanilla javascript , FastAPI is a backend framework used to build APIs , post man It is a client used to test APIs.
+- ![WhatsApp Image 2026-01-06 at 6 22 59 PM](https://github.com/user-attachments/assets/0b72a47a-d1ff-423c-be65-379debb63e1c)
 
 <img width="1600" height="820" alt="image" src="https://github.com/user-attachments/assets/42ac95ba-cbff-4c06-b540-65732a6da052" />
 
