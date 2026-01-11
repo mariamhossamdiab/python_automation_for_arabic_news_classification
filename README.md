@@ -30,5 +30,9 @@ It processes multiple CSV files, appends predictions, and prepares the data for 
 ![WhatsApp Image 2026-01-11 at 12 49 01 AM](https://github.com/user-attachments/assets/22ca932d-93bb-44cd-b515-8fb1a383455b)
 
 
+## website 
+
+<img width="1600" height="820" alt="image" src="https://github.com/user-attachments/assets/42ac95ba-cbff-4c06-b540-65732a6da052" />
+
 
 
