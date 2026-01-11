@@ -36,7 +36,8 @@ It processes multiple CSV files, appends predictions, and prepares the data for 
 - frontend using html , css, vanilla javascript , FastAPI is a backend framework used to build APIs , post man It is a client used to test APIs.
 - ![WhatsApp Image 2026-01-06 at 6 22 59 PM](https://github.com/user-attachments/assets/0b72a47a-d1ff-423c-be65-379debb63e1c)
 
-<img width="1600" height="820" alt="image" src="https://github.com/user-attachments/assets/42ac95ba-cbff-4c06-b540-65732a6da052" />
+<img width="1912" height="1078" alt="image" src="https://github.com/user-attachments/assets/cb680932-48ea-4504-9afe-e5319ea9a0b4" />
+
 
 
 
