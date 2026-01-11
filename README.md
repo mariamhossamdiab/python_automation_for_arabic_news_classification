@@ -23,6 +23,8 @@ It processes multiple CSV files, appends predictions, and prepares the data for 
   
 #fastml
 - its A virtual environment (venv) is used to isolate your Python project so it doesn’t break other projects or your system Python.
+ <img width="1125" height="606" alt="image" src="https://github.com/user-attachments/assets/6bb3c173-04c9-4e59-b32c-4f184aaa793e" />
+
 ## Powerbi Dashboard 
 
 
