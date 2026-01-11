@@ -21,7 +21,8 @@ Here’s a quick overview of what I built 👇
 - sends each article to the Gemma3 model (via Ollama) to classify its topic and whether it’s Real or Fake, then saves the classified results.
 It processes multiple CSV files, appends predictions, and prepares the data for computing global evaluation metrics.
   
-
+#fastml
+- its A virtual environment (venv) is used to isolate your Python project so it doesn’t break other projects or your system Python.
 ## Powerbi Dashboard 
 
 
