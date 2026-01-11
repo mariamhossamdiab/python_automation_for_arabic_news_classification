@@ -22,6 +22,10 @@ import ssl
 from urllib3 import poolmanager
 from requests.adapters import HTTPAdapter
 import urllib3
+from datetime import datetime
+
+
+
 def remove_emojis(text):
     if not isinstance(text, str) or not text:
         return text
@@ -59,6 +63,7 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
+
 
 OUTPUT_PATH = os.path.join(os.getcwd(), "my_data")
 os.makedirs(OUTPUT_PATH, exist_ok=True)
@@ -126,7 +131,42 @@ def safe_save_csv(df, filename):
 # =========================
 def main():
     print("\n🚀 Starting scraping run...")
-
+# --- elbashayer ---
+    try:
+        url = "https://elbashayer.com/"
+        response = safe_get(url)
+        if response:
+            tree = html.fromstring(response.text)
+            titles = tree.xpath('//h3[@class="jeg_post_title"]/a/text()')
+            links = tree.xpath('//h3[@class="jeg_post_title"]/a/@href')
+            titles = [t.strip() for t in titles]
+            df = pd.DataFrame({"Title": text_proces(titles), "Link": links})
+            df['website'] = 'elbashayer.com'
+            article_texts = []
+            for link in df["Link"]:
+                resp = safe_get(link)
+                if not resp:
+                    article_texts.append("Not found")
+                    continue
+                try:
+                    tree = html.fromstring(resp.text)
+                    paras = tree.xpath("//div[contains(@class, 'content-inner')]//p")
+                    text = "\n".join(
+                                p.text_content().strip()
+                                for p in paras
+                                if p.text_content() and p.text_content().strip()
+                            )
+                    article_texts.append(text if text else "Not found")
+                except Exception:
+                    article_texts.append("Not found")
+            df["Article_Text"] = article_texts
+            df['Article_Text'] = df['Article_Text'].apply(remove_emojis)
+            today = datetime.now().strftime("%Y-%m-%d")
+            df["date"] = today
+            safe_save_csv(df, "elbashayer.csv")
+    except Exception as e:
+        print(f"[ERROR] elshrouk section failed: {e}")
+    # --- EL SHOROUK ---
     # --- EL SHOROUK ---
     try:
         url = "https://www.shorouknews.com/"
@@ -138,7 +178,7 @@ def main():
             titles = [t.strip() for t in titles]
             links = ["https://www.shorouknews.com" + l for l in links]
             df = pd.DataFrame({"Title": text_proces(titles), "Link": links})
-            df['website'] = 'elshrouk'
+            df['website'] = 'shorouknews.com'
             article_texts = []
             for link in df["Link"]:
                 resp = safe_get(link)
@@ -154,6 +194,8 @@ def main():
                     article_texts.append("Not found")
             df["Article_Text"] = article_texts
             df['Article_Text'] = df['Article_Text'].apply(remove_emojis)
+            today = datetime.now().strftime("%Y-%m-%d")
+            df["date"] = today
             safe_save_csv(df, "elshrouk.csv")
     except Exception as e:
         print(f"[ERROR] elshrouk section failed: {e}")
@@ -175,7 +217,7 @@ def main():
         fathi.quit()
 
         df = pd.DataFrame({"Title": text_proces(titles), "Link": links})
-        df['website'] = 'elwatan'
+        df['website'] = 'elwatannews.com'
         df.drop_duplicates(subset=['Link'], inplace=True)
         article_texts = []
         for link in df["Link"]:
@@ -192,6 +234,8 @@ def main():
                 article_texts.append("Not found")
         df["Article_Text"] = article_texts
         df['Article_Text'] = df['Article_Text'].apply(remove_emojis)
+        today = datetime.now().strftime("%Y-%m-%d")
+        df["date"] = today
         safe_save_csv(df, "elwatan.csv")
     except WebDriverException as e:
         print(f"[ERROR] WebDriver failed for elwatan: {e}")
@@ -213,7 +257,7 @@ def main():
         fathi.quit()
 
         df = pd.DataFrame({"Title": text_proces(titles), "Link": links})
-        df['website'] = 'masrielyoum'
+        df['website'] = 'almasryalyoum.com'
         df.drop_duplicates(subset=['Link'], inplace=True)
         article_texts = []
         for link in df["Link"]:
@@ -230,6 +274,8 @@ def main():
                 article_texts.append("Not found")
         df["Article_Text"] = article_texts
         df['Article_Text'] = df['Article_Text'].apply(remove_emojis)
+        today = datetime.now().strftime("%Y-%m-%d")
+        df["date"] = today
         safe_save_csv(df, "elmasrielyoum.csv")
     except Exception as e:
         print(f"[ERROR] masrielyoum section failed: {e}")
@@ -245,7 +291,7 @@ def main():
         fathi.quit()
 
         df = pd.DataFrame({"Title": text_proces(titles), "Link": links})
-        df['website'] = 'youm7'
+        df['website'] = 'youm7.com'
         article_texts = []
         for link in df["Link"]:
             resp = safe_get(link)
@@ -261,6 +307,8 @@ def main():
                 article_texts.append("Not found")
         df["Article_Text"] = article_texts
         df['Article_Text'] = df['Article_Text'].apply(remove_emojis)
+        today = datetime.now().strftime("%Y-%m-%d")
+        df["date"] = today
         safe_save_csv(df, "youm7.csv")
     except TimeoutException:
         print("[WARN] youm7 timed out, skipping...")
@@ -277,7 +325,7 @@ def main():
         fathi.quit()
 
         df = pd.DataFrame({"Title": text_proces(titles), "Link": links})
-        df['website'] = 'masrawy'
+        df['website'] = 'masrawy.com'
         article_texts = []
         for link in df["Link"]:
             time.sleep(2)
@@ -293,6 +341,8 @@ def main():
                 article_texts.append("Not found")
         df["Article_Text"] = article_texts
         df['Article_Text'] = df['Article_Text'].apply(remove_emojis)
+        today = datetime.now().strftime("%Y-%m-%d")
+        df["date"] = today
         safe_save_csv(df, "masrawy.csv")
     except Exception as e:
         print(f"[ERROR] masrawy section failed: {e}")

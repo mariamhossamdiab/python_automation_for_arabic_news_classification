@@ -104,9 +104,9 @@ def analyze_file(fpath):
     ngram_path = os.path.join(out_dir, f"{base}_ngrams.csv")
     summary_path = os.path.join(out_dir, f"{base}_summary.csv")
 
-    pd.DataFrame(top_unigrams, columns=["word", "count"]).to_csv(unigram_path, index=False, encoding='utf-8-sig')
-    pd.DataFrame(top_ngrams, columns=["phrase", "count"]).to_csv(ngram_path, index=False, encoding='utf-8-sig')
-    pd.DataFrame([stats]).to_csv(summary_path, index=False, encoding='utf-8-sig')
+   # pd.DataFrame(top_unigrams, columns=["word", "count"]).to_csv(unigram_path, index=False, encoding='utf-8-sig')
+    pd.DataFrame(top_ngrams, columns=["phrase", "phrase_count"]).to_csv(ngram_path, index=False, encoding='utf-8-sig')
+    #pd.DataFrame([stats]).to_csv(summary_path, index=False, encoding='utf-8-sig')
 
     print(f"✅ Analysis complete for {base}")
     print(f"   - {unigram_path}")

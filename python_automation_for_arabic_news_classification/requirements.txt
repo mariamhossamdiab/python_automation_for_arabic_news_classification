@@ -1,0 +1,11 @@
+
+fastapi
+uvicorn
+gunicorn
+pydantic
+requests
+beautifulsoup4
+tldextract
+mysql-connector-python
+pandas
+datetime
