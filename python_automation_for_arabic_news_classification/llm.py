@@ -1,4 +1,3 @@
-
 import re
 import json
 import time
@@ -8,6 +7,55 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs, unquote
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+# ===== GLOBAL MODEL INITIALIZATION =====
+MODEL_NAME = "gemma3:4b"
+OLLAMA_PROCESS = None
+OLLAMA_READY = False
+
+def initialize_ollama():
+    """Initialize Ollama server and pull model once at startup."""
+    global OLLAMA_PROCESS, OLLAMA_READY
+    
+    if OLLAMA_READY:
+        print("✅ Ollama already initialized")
+        return True
+    
+    try:
+        print(f"🚀 Starting Ollama server...")
+        OLLAMA_PROCESS = subprocess.Popen(
+            ["ollama", "serve"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        time.sleep(3)  # Wait for server to start
+        
+        print(f"📥 Pulling model: {MODEL_NAME}...")
+        result = subprocess.run(
+            ["ollama", "pull", MODEL_NAME],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        print(f"✅ Model {MODEL_NAME} ready")
+        OLLAMA_READY = True
+        return True
+    except Exception as e:
+        print(f"❌ Failed to initialize Ollama: {e}")
+        return False
+
+def cleanup_ollama():
+    """Clean up Ollama process on exit."""
+    global OLLAMA_PROCESS, OLLAMA_READY
+    if OLLAMA_PROCESS:
+        OLLAMA_PROCESS.terminate()
+        OLLAMA_READY = False
+        print("🛑 Ollama server stopped")
+
+# ===== ORIGINAL FUNCTIONS =====
+
 def get_topic_specific_metrics(topic):
     """
     Return evaluation metrics based on the exact topic category you provided.
@@ -192,10 +240,11 @@ def get_topic_specific_metrics(topic):
     """)
 
 
-MAX_QUERY_CHARS = 300  # safe for search engines
+MAX_QUERY_CHARS = 300
 
 def safe_search_query(text):
     return text[:MAX_QUERY_CHARS]
+
 TRUSTED_DOMAINS = {
     "youm7.com",
     "elwatannews.com",
@@ -336,15 +385,15 @@ def clean_text(text):
     text = re.sub(r'\n+', '\n', text)
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
+
 MAX_CHARS = 4000
 
 def safe_text(text):
     return text[:MAX_CHARS]
 
+def check_count(lst):
+    return 10 if lst.count(1) >= 3 else 0
 
-# =========================
-# MAIN FUNCTION YOU NEED
-# =========================
 
 def search_and_extract_facts(search_query, max_facts=5):
     """
@@ -396,35 +445,37 @@ def search_and_extract_facts(search_query, max_facts=5):
     return facts, trusted_count, trusted_exists
 
 
-#MODEL_NAME="llama2:7b"
-MODEL_NAME = "gemma3:4b"  # Ensure you pull this model first
-# Weighting Logic (Calculated in Python, not LLM)
+# ===== METRIC WEIGHTS =====
 METRIC_WEIGHTS = {
-     "source_reputation": 0.15, # Python-checked domain trust
-        "evidence_quality": 0.15,
-    "fact_check": 0.45, # Does the logic hold up?
-    "topic_consistency": 0.05,  # Does it match the topic context?
-    "cross_reference": 0.10 ,
-    "writing_style": 0.02 , # Is it professional/sensational?
-  "topic_rules": 0.08
+    "source_reputation": 0.15,
+    "evidence_quality": 0.15,
+    "fact_check": 0.45,
+    "topic_consistency": 0.05,
+    "cross_reference": 0.10,
+    "writing_style": 0.02,
+    "topic_rules": 0.08
 }
+
 
 def extract_json(text):
     """Robustly extracts JSON object from LLM chatter."""
-    # Find the first { and the last }
     match = re.search(r"(\{.*\})", text, re.DOTALL)
     if match:
         json_str = match.group(1)
-        # Cleanup common LLM JSON errors
-        json_str = re.sub(r",\s*}", "}", json_str) # Trailing commas
+        json_str = re.sub(r",\s*}", "}", json_str)
         try:
             return json.loads(json_str)
         except json.JSONDecodeError:
             return None
     return None
 
+
 def run_ollama(prompt):
     """Sends prompt to Ollama and returns raw string response."""
+    if not OLLAMA_READY:
+        print("❌ Ollama not initialized. Call initialize_ollama() first.")
+        return ""
+    
     cmd = [
         "curl", "-s", "-X", "POST", "http://localhost:11434/api/generate",
         "-H", "Content-Type: application/json",
@@ -432,27 +483,28 @@ def run_ollama(prompt):
     ]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         response_json = json.loads(result.stdout)
         return response_json.get("response", "")
     except Exception as e:
         print(f"Error calling Ollama: {e}")
         return ""
-# MAIN FUNCTION
-def classify_news(article_text: str,trusted_count,trusted_exists ,facts):
-    try:
-        subprocess.Popen(["ollama", "serve"])
-        time.sleep(5)
-        subprocess.run(["ollama", "pull", MODEL_NAME], check=True)
-    except Exception as e:
+
+
+def classify_news(article_text: str, trusted_count, trusted_exists, facts):
+    """Classify news article - Ollama must be initialized first."""
+    
+    if not OLLAMA_READY:
         return {
             "topic": "Unknown",
-            "score": "0%",
             "classification": "Unknown",
-            "reason": f"Ollama unavailable: {e}"
+            "confidence_score": "0%",
+            "reason": "Ollama not initialized. Call initialize_ollama() at program startup."
         }
+    
     source_score = 10 if trusted_exists else 5
-    cross_reference = 10 if trusted_count >=2 else 5
+    cross_reference = 10 if trusted_count >= 2 else 5
+
     # STEP 1 — Detect Topic
     topic_prompt = f"""
     Determine the main topic of the following Arabic article.
@@ -465,46 +517,45 @@ def classify_news(article_text: str,trusted_count,trusted_exists ,facts):
     Article:
     {article_text}
     """
-    raw_topic = run_ollama( topic_prompt)
+    raw_topic = run_ollama(topic_prompt)
     topic = raw_topic.strip() if raw_topic else "Unknown"
 
     topic_rules = get_topic_specific_metrics(topic)
 
-    facts_list = facts.split("|")
+    facts_list = facts
+    f1 = facts_list[0] if len(facts_list) > 0 else "N/A"
+    f2 = facts_list[1] if len(facts_list) > 1 else "N/A"
+    f3 = facts_list[2] if len(facts_list) > 2 else "N/A"
+    f4 = facts_list[3] if len(facts_list) > 3 else "N/A"
+    f5 = facts_list[4] if len(facts_list) > 4 else "N/A"
+    print(facts_list)
 
     prompt = f"""
-    You are a fact verification system and high-precision numerical verification system , Output ONLY valid JSON.
+    SYSTEM: You are a JSON-only fact verification API. You must return ONLY valid JSON. No explanations allowed.
 
-    ARTICLE:
+    TASK: Compare facts against article text and return verification scores.
+
+    ARTICLE TEXT:
     {article_text}
 
-    VERIFY THESE 5 FACTS:
-    1. {facts_list[0] if len(facts_list) > 0 else "N/A"}
-    2. {facts_list[1] if len(facts_list) > 1 else "N/A"}
-    3. {facts_list[2] if len(facts_list) > 2 else "N/A"}
-    4. {facts_list[3] if len(facts_list) > 3 else "N/A"}
-    5. {facts_list[4] if len(facts_list) > 4 else "N/A"}
+    FACTS TO VERIFY:
+    1. {f1}
+    2. {f2}
+    3. {f3}
+    4. {f4}
+    5. {f5}
 
-    For each fact:
-    CRITERIA FOR A 1 (SUPPORTED):
-    - The exact number or value is present in the article.
-    - If a range is provided, the value must fall within it or match the bounds.
-    - The units (e.g., millions vs. billions, %, kg) must match exactly.
-    - The direction of change (e.g., 'increased' vs 'decreased') must match.
+    RULES:
+    - 1 = fact is directly stated in article with matching numbers/values
+    - 0 = fact contradicts article or is not mentioned
 
-    CRITERIA FOR A 0 (contradicts):
-    - The number differs (even by a small margin).
-    - The article does not mention the specific metric or value.
-    - The value is mentioned but applied to a different entity or timeline.
-    Output format:
-    {{"verification_results": [0, 1, 0, 1, 1]}}
-
-    Output ONLY the JSON now:
+    REQUIRED OUTPUT FORMAT (nothing else):
+    {{"verification_results": [0, 0, 0, 0, 0]}}
     """
 
     fact_check_response = run_ollama(prompt)
-    print("🔍 Fact Check Response:", fact_check_response
-          )
+    print("🔍 Fact Check Response:", fact_check_response)
+
     verification_list = [0, 0, 0, 0, 0]
     fact_check_score = 0
 
@@ -512,14 +563,17 @@ def classify_news(article_text: str,trusted_count,trusted_exists ,facts):
         print("❌ Failed to extract verification JSON")
     else:
         try:
-            parsed = json.loads(fact_check_response)
-            verification_list = parsed["verification_results"]
-            if len(verification_list) != 5:
-                verification_list = (verification_list + [0, 0, 0, 0, 0])[:5]
-
-            fact_check_score = check_count(verification_list)
-        except json.JSONDecodeError:
+            parsed = extract_json(fact_check_response)
+            if parsed and "verification_results" in parsed:
+                verification_list = parsed["verification_results"]
+                if len(verification_list) != 5:
+                    verification_list = (verification_list + [0, 0, 0, 0, 0])[:5]
+                fact_check_score = check_count(verification_list)
+            else:
+                print("❌ JSON missing 'verification_results' key")
+        except Exception:
             print("❌ Invalid JSON returned from Ollama")
+
     # STEP 3 - Other Metrics
     prompt = f"""
     Analyze this news text and return ONLY valid JSON with these 4 scores (0-10):
@@ -545,7 +599,6 @@ def classify_news(article_text: str,trusted_count,trusted_exists ,facts):
 
     metrics = extract_json(raw_response)
 
-    # FIX: Ensure all metrics are integers, not dicts
     if not metrics:
         metrics = {
             "writing_style": 5,
@@ -555,15 +608,13 @@ def classify_news(article_text: str,trusted_count,trusted_exists ,facts):
             "flag_reason": "Model failed to generate valid JSON"
         }
     else:
-        # Ensure each metric is an integer
         for key in ["writing_style", "evidence_quality", "topic_consistency", "topic_rules"]:
             value = metrics.get(key, 5)
-            # If it's a dict or any non-numeric type, default to 5
             if not isinstance(value, (int, float)):
                 print(f"⚠️ Warning: {key} is not a number: {value}")
                 metrics[key] = 5
             else:
-                metrics[key] = int(value)  # Ensure it's an integer
+                metrics[key] = int(value)
 
     # Calculate Final Weighted Score
     weighted_score = (
@@ -581,12 +632,10 @@ def classify_news(article_text: str,trusted_count,trusted_exists ,facts):
 
     return {
         "topic": topic,
-       # "text_snippet": article_text[:50] + "...",
-       # "fact_check_score": fact_check_score,
         "classification": classification,
         "confidence_score": f"{final_percentage}%"
-      #  ,"detailed_scores": {
-       #     "source_trust": source_score,
-        #    "cross_reference": cross_reference,
-    #   **metrics    }
     }
+
+
+initialize_ollama()
+ 
