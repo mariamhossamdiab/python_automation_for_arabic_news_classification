@@ -19,8 +19,7 @@ Here’s a quick overview of what I built 👇
 ## google colab
 - sends each article to the Gemma3 model (via Ollama) to classify its topic and whether it’s Real or Fake, then saves the classified results.
 It processes multiple CSV files, appends predictions, and prepares the data for computing global evaluation metrics.
-- test the model with 91% accuracy
-<img width="1003" height="212" alt="image" src="https://github.com/user-attachments/assets/a7acb9d9-d63d-4dc9-ab7b-3282c5850c8b" />
+  
 
 ## Powerbi Dashboard 
 
